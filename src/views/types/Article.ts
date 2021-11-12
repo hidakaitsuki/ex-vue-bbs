@@ -1,11 +1,17 @@
 import { Comment } from "./Comment";
-
+/**
+ * 記事を表す部品用のクラス.
+ */
 export class Article {
   constructor(
+    // id
     private _id: number,
+    // 名前
     private _name: string,
+    // 投稿内容
     private _content: string,
-    private __commentList: Array<Comment>
+    // 入力されたコメント一覧
+    private _commentList: Array<Comment>
   ) {}
 
   public get id(): number {
@@ -32,11 +38,12 @@ export class Article {
     this._content = content;
   }
 
-  public get _commentList(): Array<Comment> {
-    return this.__commentList;
+  public get commentList(): Array<Comment> {
+    return this._commentList;
   }
 
-  public set _commentList(_commentList: Array<Comment>) {
-    this.__commentList = _commentList;
+  public set commentList(commentList: Array<Comment>) {
+    this._commentList = commentList;
   }
+
 }

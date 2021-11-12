@@ -1,9 +1,16 @@
+/**
+ * コメントを表すクラス.
+ */
 export class Comment {
   constructor(
+    // id
     private _id: number,
+    // 名前
     private _name: string,
+    // コメント内容
     private _content: string,
-    private _articleId: number
+    //関連された記事のid
+        private _articleId: number
   ) {}
 
   public get id(): number {

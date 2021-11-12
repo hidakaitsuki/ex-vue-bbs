@@ -1,12 +1,12 @@
-import { Article } from '@/views/types/Article'
-import { Comment } from '@/views/types/Comment'
-import Vue from 'vue'
-import Vuex from 'vuex'
+import { Article } from "@/views/types/Article";
+import { Comment } from "@/views/types/Comment";
+import Vue from "vue";
+import Vuex from "vuex";
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export default new Vuex.Store({
-  strict:true,
+  strict: true,
   state: {
     articles: [
       new Article(3, "佐藤", "佐藤さんの記事", []),
@@ -19,21 +19,59 @@ export default new Vuex.Store({
       ]),
     ],
   },
-  mutations: {
-  },
-  actions: {
-  },
-  modules: {
-  },
-getters:{
-/**
- * 
- * @param state ステートオブジェクト
- * @returns 投稿情報の一覧
- */
-getArticles(state){
-  return state.articles
-}
 
-}
-})
+  mutations: {
+    /**
+     * 記事情報を配列の一番最初に追加する.
+     * @param state ステートオブジェクト
+     * @param payload 入力された記事情報
+     */
+    addArticle(state, payload) {
+      state.articles.unshift(payload);
+    },
+    /**
+     *コメント情報を配列一番最初に追加する
+     * @param state ステートオブジェクト
+     * @param payload 入力されたコメント情報
+     */
+    addComment(state, payload) {
+     const commentarticle=state.articles.filter((article) => article.id == payload.articleId);
+      const newComment = new Comment(
+        payload.id,
+        payload.name,
+        payload.content,
+        payload.articleId
+      );
+      commentarticle[0].commentList.unshift(newComment)
+      
+    },
+    // const currentarticle = state.articles[payload.articleId];
+    // const newComment = new Comment(
+    //   payload.id,
+    //   payload.name,
+    //   payload.content,
+    //   payload.articleId
+    // );
+    // currentarticle.commentList.unshift(newComment);
+  },
+  actions: {},
+  modules: {},
+  getters: {
+    /**
+     * 記事一覧を返す.
+     * @param state ステートオブジェクト
+     * @returns 記事一覧
+     */
+    getArticles(state) {
+      return state.articles;
+    },
+    /**
+     * 最新のIDを返す
+     * @param state ステートオブジェクト
+     * @returns 最新のID
+     */
+    getnewId(state) {
+      return state.articles[0].id + 1;
+    },
+  },
+});
