@@ -1,6 +1,5 @@
 <template>
   <div>
-    <p></p>
     <p v-if="nameError" class="error">名前を入力してください</p>
     <p v-if="nameLengthError" class="error">名前は50字以内で入力してください</p>
     名前：<br />
@@ -44,40 +43,42 @@ export default class CompComment extends Vue {
    * 入力された内容をコメントに追加する.
    */
   addComment(articleId: number): void {
+    this.nameError = false;
+    this.nameLengthError = false;
+    this.contentError = false;
+
     // 名前が空ならエラーを表示する
     if (this.name == "") {
       this.nameError = true;
-    } else {
-      this.nameError = false;
     }
+
     // 名前51文字以上ならエラーを表示する
     if (this.name.length >= 51) {
       this.nameLengthError = true;
-    } else {
-      this.nameLengthError = false;
     }
+
     // 内容が空ならエラーを表示する
     if (this.content == "") {
       this.contentError = true;
-    } else {
-      this.contentError = false;
     }
-    
-    // エラーが何もなければ実行する
-    if (
-      this.nameError == false &&
-      this.nameLengthError == false &&
-      this.contentError == false
-    ) {
-      this["$store"].commit(
-        "addComment",
-        new Comment(-1, this.name, this.content, articleId)
-      );
 
-      // 入力内容をリセットする
-      this.name = "";
-      this.content = "";
+    // エラーが1つでもあれば処理を進めない
+    if (
+      this.nameError == true ||
+      this.nameLengthError == true ||
+      this.contentError == true
+    ) {
+      return;
     }
+
+    this["$store"].commit(
+      "addComment",
+      new Comment(-1, this.name, this.content, articleId)
+    );
+
+    // 入力内容をリセットする
+    this.name = "";
+    this.content = "";
   }
 }
 </script>

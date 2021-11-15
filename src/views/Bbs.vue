@@ -74,38 +74,39 @@ export default class Bbs extends Vue {
    * 入力された内容を記事に追加する.
    */
   addArticle(): void {
+    this.nameError = false;
+    this.nameLengthError = false;
+    this.contentError = false;
+
     // 名前が空ならエラーを表示する
     if (this.name == "") {
       this.nameError = true;
-    } else {
-      this.nameError = false;
     }
     // 名前が51文字以上ならエラーを表示する
     if (this.name.length >= 51) {
       this.nameLengthError = true;
-    } else {
-      this.nameLengthError = false;
     }
     // 内容が空ならエラーを表示する
     if (this.content == "") {
       this.contentError = true;
-    } else {
-      this.contentError = false;
     }
 
-    // エラーが何もなければ実行する
+    // エラーが1つでもあれば処理を先に進めない
     if (
-      this.nameError == false &&
-      this.nameLengthError == false &&
-      this.contentError == false
+      this.nameError == true ||
+      this.nameLengthError == true ||
+      this.contentError == true
     ) {
-      // 最新のIDを取得
-      const newId = this["$store"].getters.getNewId;
-      this["$store"].commit(
-        "addArticle",
-        new Article(newId, this.name, this.content, [])
-      );
+      return;
     }
+
+    // 最新のIDを取得
+    const newId = this["$store"].getters.getNewId;
+    this["$store"].commit(
+      "addArticle",
+      new Article(newId, this.name, this.content, [])
+    );
+
     // 入力内容をリセットする
     this.name = "";
     this.content = "";
