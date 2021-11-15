@@ -1,7 +1,11 @@
 <template>
   <div>
     <h1>掲示板サイト</h1>
+    <p v-if="nameError" class="error">名前を入力してください</p>
+    <p v-if="nameLengthError" class="error">名前は50字以内で入力してください</p>
     投稿者名<input type="text" v-model="name" /><br />
+    <p v-if="contentError" class="error">内容を入力してください</p>
+
     投稿内容<textarea
       name=""
       id=""
@@ -14,7 +18,7 @@
 
     <hr />
     <div
-      v-for="currentArticle of currentArticles"
+      v-for="(currentArticle, i) of currentArticles"
       v-bind:key="currentArticle.id"
     >
       <p>投稿者名：{{ currentArticle.name }}</p>
@@ -23,27 +27,15 @@
         {{ currentArticle.content }}
       </p>
 
-      <button type="button">投稿削除</button>
+      <button type="button" v-on:click="deleteArticle(i)">投稿削除</button>
 
       <p v-for="comment of currentArticle.commentList" v-bind:key="comment.id">
         コメント者名：{{ comment.name }} <br />
         コメント内容：<br />
         {{ comment.content }}
       </p>
+      <comp-comment v-bind:articleId="currentArticle.id"></comp-comment>
 
-      <p>
-        名前：<br />
-        <input type="text" v-model="commentName" />
-      </p>
-      <p>
-        コメント：<br />
-        <textarea name="" id="" cols="30" rows="5" v-model="commentContent">
-        </textarea
-        ><br />
-        <button type="button" v-on:click="addComment(currentArticle.id)">
-          コメント投稿
-        </button>
-      </p>
       <hr />
     </div>
   </div>
@@ -53,9 +45,10 @@
 import Vue from "vue";
 import Component from "vue-class-component";
 import { Article } from "./types/Article";
-import { Comment } from "./types/Comment";
-
-@Component
+import CompComment from "../components/CompComment.vue";
+@Component({
+  components: { CompComment },
+})
 export default class Bbs extends Vue {
   // 現在の記事情報
   private currentArticles = [];
@@ -65,10 +58,12 @@ export default class Bbs extends Vue {
   private content = "";
   //   現在の記事のコメントリスト
   private currentcomment = [];
-  //   コメントに入力された名前
-  private commentName = "";
-  // 入力されたコメント
-  private commentContent = "";
+  // 名前が未入力のときのエラーメッセージ
+  private nameError = false;
+  // 名前が51文字以上のときのエラーメッセージ
+  private nameLengthError = false;
+  // 内容がが未入力のときのエラーメッセージ
+  private contentError = false;
   /**
    * 現在投稿されている内容を一覧で表示する.
    */
@@ -79,29 +74,55 @@ export default class Bbs extends Vue {
    * 入力された内容を記事に追加する.
    */
   addArticle(): void {
-    // 最新のIDを取得
-    const newId = this["$store"].getters.newId;
-    this["$store"].commit(
-      "addArticle",
-      new Article(newId, this.name, this.content, [])
-    );
+    // 名前が空ならエラーを表示する
+    if (this.name == "") {
+      this.nameError = true;
+    } else {
+      this.nameError = false;
+    }
+    // 名前が51文字以上ならエラーを表示する
+    if (this.name.length >= 51) {
+      this.nameLengthError = true;
+    } else {
+      this.nameLengthError = false;
+    }
+    // 内容が空ならエラーを表示する
+    if (this.content == "") {
+      this.contentError = true;
+    } else {
+      this.contentError = false;
+    }
+
+    // エラーが何もなければ実行する
+    if (
+      this.nameError == false &&
+      this.nameLengthError == false &&
+      this.contentError == false
+    ) {
+      // 最新のIDを取得
+      const newId = this["$store"].getters.getNewId;
+      this["$store"].commit(
+        "addArticle",
+        new Article(newId, this.name, this.content, [])
+      );
+    }
     // 入力内容をリセットする
     this.name = "";
     this.content = "";
   }
   /**
-   * 入力された内容をコメントに追加する
+   * 記事を削除する.
+   *
+   * @param  articleIndex - 記事のIndex番号
    */
-  addComment(articleId: number): void {
-    this["$store"].commit(
-      "addComment",
-      new Comment(-1, this.commentName, this.commentContent, articleId)
-    );
-    // 入力内容をリセットする
-    this.commentName = "";
-    this.commentContent = "";
+  deleteArticle(articleIndex: number): void {
+    this["$store"].commit("deleteArticle", articleIndex);
   }
 }
 </script>
 
-<style></style>
+<style scoped>
+.error {
+  color: red;
+}
+</style>

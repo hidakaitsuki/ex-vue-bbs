@@ -45,5 +45,4 @@ export class Article {
   public set commentList(commentList: Array<Comment>) {
     this._commentList = commentList;
   }
-
 }

@@ -30,29 +30,30 @@ export default new Vuex.Store({
       state.articles.unshift(payload);
     },
     /**
-     *コメント情報を配列一番最初に追加する
+     *コメント情報を配列一番最初に追加する.
      * @param state ステートオブジェクト
      * @param payload 入力されたコメント情報
      */
     addComment(state, payload) {
-     const commentarticle=state.articles.filter((article) => article.id == payload.articleId);
+      const commentArticle = state.articles.filter(
+        (article) => article.id == payload.articleId
+      );
       const newComment = new Comment(
         payload.id,
         payload.name,
         payload.content,
         payload.articleId
       );
-      commentarticle[0].commentList.unshift(newComment)
-      
+      commentArticle[0].commentList.unshift(newComment);
     },
-    // const currentarticle = state.articles[payload.articleId];
-    // const newComment = new Comment(
-    //   payload.id,
-    //   payload.name,
-    //   payload.content,
-    //   payload.articleId
-    // );
-    // currentarticle.commentList.unshift(newComment);
+    /**
+     * 渡された番号の記事を削除する.
+     * @param state ステートオブジェクト
+     * @param payload 対象の記事のインデックス番号
+     */
+    deleteArticle(state, payload) {
+      state.articles.splice(payload, 1);
+    },
   },
   actions: {},
   modules: {},
@@ -70,7 +71,7 @@ export default new Vuex.Store({
      * @param state ステートオブジェクト
      * @returns 最新のID
      */
-    getnewId(state) {
+    getNewId(state) {
       return state.articles[0].id + 1;
     },
   },
